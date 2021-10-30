@@ -1,6 +1,7 @@
 import express from "express"
 import createError from "http-errors"
 import { Span, Tracer } from "opentracing"
+import requestId from "../../util/requestId"
 import prometheus from "../../util/prometheus"
 import tracing from "../../util/tracing"
 
@@ -12,6 +13,7 @@ import tracing from "../../util/tracing"
 const buildApp = (app: express.Application, tracer: Tracer) => {
   app.use(prometheus.middleware) // Meters Traffic in this app
   app.use(tracing.middleware(tracer)) // Guarantees Presence of res.local.span
+  app.use(requestId.middleware)
 
   // Define the Http Response Functions
   app.get("/ping", (req, res) => {
