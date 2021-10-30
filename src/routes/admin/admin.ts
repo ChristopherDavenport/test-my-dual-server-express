@@ -11,6 +11,8 @@ import tracing from "../../util/tracing"
 const buildApp = (app: express.Application, tracer: Tracer) => {
   app.use(tracing.middleware(tracer))
   // Only Run This Middleware on Admin App to serve metrics calls
+  // Ensures other endpoints on admin don't trigger metrics
+  // which would get confusing for the http metrics.
   app.get('/metrics', async (req, res, next) => {
     prometheus.middleware(req, res, next)
   })

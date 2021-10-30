@@ -4,14 +4,14 @@ import { Span, Tracer } from "opentracing"
 import prometheus from "../../util/prometheus"
 import tracing from "../../util/tracing"
 
-/*
-  HTTP Server Declaration
-*/
 
+/**
+ * HTTP Server Declaration
+ * TODO: Investigate Router, Isolate Handler Functions
+ */
 const buildApp = (app: express.Application, tracer: Tracer) => {
-  // const app = express();
-  app.use(prometheus.middleware)
-  app.use(tracing.middleware(tracer))
+  app.use(prometheus.middleware) // Meters Traffic in this app
+  app.use(tracing.middleware(tracer)) // Guarantees Presence of res.local.span
 
   // Define the Http Response Functions
   app.get("/ping", (req, res) => {
@@ -23,7 +23,7 @@ const buildApp = (app: express.Application, tracer: Tracer) => {
   })
 
   app.get( "/", ( req, res ) => {
-    res.json( { foo: "Hello world!"} );
+    res.json( { foo: "Hello world!"} )
   } )
 
   app.get("/hello/:bar", (req, res) => {
@@ -40,8 +40,8 @@ const buildApp = (app: express.Application, tracer: Tracer) => {
 
   // catch 404 and forward to error handler
   app.use((req, res, next) =>  {
-    next(createError(404));
-  });
+    next(createError(404))
+  })
 
   // error handler -- Types dont work currently
   app.use((err: any, req: express.Request, res: express.Response, next: any) =>  {
