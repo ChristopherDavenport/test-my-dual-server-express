@@ -1,10 +1,10 @@
 import express from "express"
-import http, { Server } from 'http';
+import http, { Server } from 'http'
 import adminApp from './routes/admin/admin'
-import tracing from './util/tracing';
+import tracing from './util/tracing'
 import httpApp from './routes/http/http'
-import configs, { ServerConfig } from "./config/configs";
-import { JaegerTracer } from "jaeger-client";
+import configs, { ServerConfig } from "./config/configs"
+import { JaegerTracer } from "jaeger-client"
 import globals from "./config/globals"
 
 // Helper Functions

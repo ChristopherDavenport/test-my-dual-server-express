@@ -1,8 +1,8 @@
-import express, { application } from "express";
-import createError from "http-errors";
-import { Span, Tracer } from "opentracing";
-import prometheus from "../../util/prometheus";
-import tracing from "../../util/tracing";
+import express, { application } from "express"
+import createError from "http-errors"
+import { Span, Tracer } from "opentracing"
+import prometheus from "../../util/prometheus"
+import tracing from "../../util/tracing"
 
 /*
   HTTP Server Declaration
@@ -20,7 +20,7 @@ const buildApp = (app: express.Application, tracer: Tracer) => {
 
   app.get( "/", ( req, res ) => {
     res.json( { foo: "Hello world!"} );
-  } );
+  } )
 
   app.get("/hello/:bar", (req, res) => {
     const value = req.params.bar
@@ -42,14 +42,14 @@ const buildApp = (app: express.Application, tracer: Tracer) => {
   // error handler -- Types dont work currently
   app.use((err: any, req: express.Request, res: express.Response, next: any) =>  {
     // set locals, only providing error in development
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
+    res.locals.message = err.message
+    res.locals.error = req.app.get('env') === 'development' ? err : {}
 
 
     // render the error page
-    res.status(err.status || 500);
-    res.json({level: 'error', error: res.locals.error}); // Probably Need a Different PROD default
-  });
+    res.status(err.status || 500)
+    res.json({level: 'error', error: res.locals.error}) // Probably Need a Different PROD default
+  })
 
   return app
 }

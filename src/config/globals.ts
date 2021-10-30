@@ -1,8 +1,8 @@
-import configs, {HttpConfig, ServerConfig} from "./configs";
+import configs, {HttpConfig, ServerConfig} from "./configs"
 import express from "express"
-import http, { Server } from 'http';
-import { JaegerTracer } from "jaeger-client";
-import tracing from "../util/tracing";
+import http, { Server } from 'http'
+import { JaegerTracer } from "jaeger-client"
+import tracing from "../util/tracing"
 
 const onListen = (server: http.Server, port: number, desc: string) => {
   server.on("listening", () => {

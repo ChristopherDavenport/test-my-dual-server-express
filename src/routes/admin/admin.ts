@@ -1,8 +1,8 @@
-import express from "express";
-import createError from "http-errors";
-import { Tracer } from "opentracing";
-import prometheus from "../../util/prometheus";
-import tracing from "../../util/tracing";
+import express from "express"
+import createError from "http-errors"
+import { Tracer } from "opentracing"
+import prometheus from "../../util/prometheus"
+import tracing from "../../util/tracing"
 
 /*
   Health Server Declaration
@@ -36,18 +36,18 @@ const buildApp = (app: express.Application, tracer: Tracer) => {
 
   // catch 404 and forward to error handler
   app.use((req, res, next) =>  {
-    next(createError(404));
-  });
+    next(createError(404))
+  })
 
   app.use((err: any, req: express.Request, res: express.Response, next: any) =>  {
     // set locals, only providing error in development
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
+    res.locals.message = err.message
+    res.locals.error = req.app.get('env') === 'development' ? err : {}
 
     // render the error page
-    res.status(err.status || 500);
-    res.json({level: 'error', err});
-  });
+    res.status(err.status || 500)
+    res.json({level: 'error', err})
+  })
   return app
 }
 
