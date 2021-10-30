@@ -10,7 +10,7 @@ const onListen = (server: http.Server, port: number, desc: string) => {
   })
 }
 
-const buildServer = (httpConfig: HttpConfig, listener: (express: express.Express) => http.RequestListener) => {
+const buildServer = (httpConfig: HttpConfig, listener: (express: express.Application) => http.RequestListener) => {
   const httpApplication = express()
   httpApplication.set('port', httpConfig.port)
   const httpServer = http.createServer(listener(httpApplication))
@@ -21,15 +21,15 @@ const buildServer = (httpConfig: HttpConfig, listener: (express: express.Express
 
 export interface Globals {
   tracer: JaegerTracer,
-  httpServerSetup: (listener: (express: express.Express) => http.RequestListener) => http.Server,
-  adminServerSetup: (listener: (express: express.Express) => http.RequestListener) => http.Server,
+  httpServerSetup: (listener: (express: express.Application) => http.RequestListener) => http.Server,
+  adminServerSetup: (listener: (express: express.Application) => http.RequestListener) => http.Server,
 }
 
 const loadGlobals: (config: ServerConfig) => Globals =  (config: ServerConfig) => {
   return {
     tracer: tracing.createTracer(config.tracing),
-    httpServerSetup: (listener: (express: express.Express) => http.RequestListener) => buildServer(config.http, listener),
-    adminServerSetup: (listener: (express: express.Express) => http.RequestListener) => buildServer(config.admin, listener),
+    httpServerSetup: (listener: (express: express.Application) => http.RequestListener) => buildServer(config.http, listener),
+    adminServerSetup: (listener: (express: express.Application) => http.RequestListener) => buildServer(config.admin, listener),
   }
 }
 
