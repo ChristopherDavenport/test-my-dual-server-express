@@ -3,16 +3,11 @@ import http, { Server } from 'http';
 import adminApp from './routes/admin/admin'
 import tracing from './util/tracing';
 import httpApp from './routes/http/http'
-import configs from "./config/configs";
-import { Tracer } from "opentracing";
+import configs, { ServerConfig } from "./config/configs";
 import { JaegerTracer } from "jaeger-client";
+import globals from "./config/globals"
 
 // Helper Functions
-const onListen = (server: http.Server, port: number, desc: string) => {
-  server.on("listening", () => {
-    console.log(desc + " Server started at: " + port)
-  })
-}
 
 const shutdownServers = (httpServer: http.Server, adminServer: http.Server, tracer: JaegerTracer) => {
   process.on('SIGTERM', () => {
@@ -40,23 +35,15 @@ const shutdownServers = (httpServer: http.Server, adminServer: http.Server, trac
 
 // Server Setup and Initialization
 const runServer = () => {
-  const config = configs.loadConfig()
-  const tracer = tracing.createTracer(config.tracing)
+  const config: ServerConfig = configs.loadConfig()
+  const {
+    tracer,
+    httpServerSetup,
+    adminServerSetup
+  } = globals.loadGlobals(config)
 
-  // Abstract Server Creation?
-  const httpApplication = express()
-  httpApplication.set('port', config.http.port)
-  const httpServer = http.createServer(httpApp.buildApp(httpApplication, tracer))
-  onListen(httpServer, config.http.port, config.http.description)
-  httpServer.listen(config.http.port)
-
-
-  const adminApplication = express()
-  adminApplication.set('port', config.admin.port)
-  const adminServer = http.createServer(adminApp.buildApp(adminApplication, tracer))
-  onListen(adminServer, config.admin.port, config.admin.description)
-  adminServer.listen(config.admin.port)
-
+  const httpServer = httpServerSetup(exp => httpApp.buildApp(exp, tracer))
+  const adminServer = adminServerSetup(exp => adminApp.buildApp(exp, tracer))
 
   shutdownServers(httpServer, adminServer, tracer)
 }
