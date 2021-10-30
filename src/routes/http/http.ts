@@ -18,6 +18,10 @@ const buildApp = (app: express.Application, tracer: Tracer) => {
     res.send("pong")
   })
 
+  app.get("/health", (req, res) => {
+    res.send()
+  })
+
   app.get( "/", ( req, res ) => {
     res.json( { foo: "Hello world!"} );
   } )
