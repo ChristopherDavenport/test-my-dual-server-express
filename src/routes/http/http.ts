@@ -45,8 +45,9 @@ const buildApp = (app: express.Application, tracer: Tracer) => {
     const value = req.params.entry
     const span: Span = res.locals.span
     const id: RequestId = res.locals.requestId
+    span.setTag("request.id", id)
     const client = c.propagatedClient(id)(span)
-    const resp = await client.get("http://localhost:8080/hello/" + value) 
+    const resp = await client.get("http://localhost:8080/hello/" + value)
     // We actually round trip with our current span! This shows up correctly!
     res.json(resp.data)
   })
