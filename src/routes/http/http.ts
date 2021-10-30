@@ -1,9 +1,10 @@
 import express from "express"
 import createError from "http-errors"
 import { Span, Tracer } from "opentracing"
-import requestId from "../../middleware/requestId"
+import requestId, { RequestId } from "../../middleware/requestId"
 import prometheus from "../../middleware/prometheus"
 import tracing from "../../middleware/tracing"
+import c from "../../middleware/client"
 
 
 /**
@@ -38,6 +39,15 @@ const buildApp = (app: express.Application, tracer: Tracer) => {
     )
     span2.finish()
     res.json({foo: "Hello " + value + "!"})
+  })
+
+  app.get("/client/hello/:entry", async (req, res) => {
+    const value = req.params.entry
+    const span: Span = res.locals.span
+    const id: RequestId = res.locals.requestId
+    const client = c.propagatedClient(id)(span)
+    const resp = await client.get("http://localhost:8080/hello/" + value)
+    res.json(resp.data)
   })
 
   // catch 404 and forward to error handler
