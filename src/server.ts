@@ -16,7 +16,7 @@ const onListen = (server: http.Server, port: number, desc: string) => {
 
 const shutdownServers = (httpServer: http.Server, adminServer: http.Server, tracer: JaegerTracer) => {
   process.on('SIGTERM', () => {
-    console.log('Termination Sent')
+    console.log('SIGTERM Sent')
     adminServer.close(() => {
       console.log('Admin server closed')
     })
@@ -26,7 +26,7 @@ const shutdownServers = (httpServer: http.Server, adminServer: http.Server, trac
     })
   })
   process.on('SIGINT', () => {
-    console.log('Termination Sent')
+    console.log('SIGINT Sent')
     adminServer.close(() => {
       console.log('Admin server closed')
     })
@@ -47,14 +47,16 @@ const runServer = () => {
   const httpApplication = express()
   httpApplication.set('port', config.http.port)
   const httpServer = http.createServer(httpApp.buildApp(httpApplication, tracer))
-  httpServer.listen(config.http.port)
   onListen(httpServer, config.http.port, config.http.description)
+  httpServer.listen(config.http.port)
+
 
   const adminApplication = express()
   adminApplication.set('port', config.admin.port)
   const adminServer = http.createServer(adminApp.buildApp(adminApplication, tracer))
-  adminServer.listen(config.admin.port)
   onListen(adminServer, config.admin.port, config.admin.description)
+  adminServer.listen(config.admin.port)
+
 
   shutdownServers(httpServer, adminServer, tracer)
 }
