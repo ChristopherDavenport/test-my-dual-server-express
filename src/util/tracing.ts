@@ -52,8 +52,6 @@ const buildMiddleware = (tracer: opentracing.Tracer) => {
   }
 }
 
-
-
 const info = (msg: string) => {
   console.info(msg)
 }

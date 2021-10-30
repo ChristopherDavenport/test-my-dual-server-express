@@ -1,6 +1,6 @@
-import configs, {HttpConfig, ServerConfig} from "./configs"
+import {HttpConfig, ServerConfig} from "./configs"
 import express from "express"
-import http, { Server } from 'http'
+import http from 'http'
 import { JaegerTracer } from "jaeger-client"
 import tracing from "../util/tracing"
 
@@ -35,5 +35,5 @@ const loadGlobals: (config: ServerConfig) => Globals =  (config: ServerConfig) =
 
 
 export default {
-  loadGlobals
+  loadGlobals,
 }

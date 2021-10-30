@@ -1,4 +1,4 @@
-import express, { application } from "express"
+import express from "express"
 import createError from "http-errors"
 import { Span, Tracer } from "opentracing"
 import prometheus from "../../util/prometheus"
