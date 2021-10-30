@@ -1,7 +1,5 @@
-import express from "express"
-import http, { Server } from 'http'
+import http from 'http'
 import adminApp from './routes/admin/admin'
-import tracing from './util/tracing'
 import httpApp from './routes/http/http'
 import configs, { ServerConfig } from "./config/configs"
 import { JaegerTracer } from "jaeger-client"
@@ -33,7 +31,15 @@ const shutdownServers = (httpServer: http.Server, adminServer: http.Server, trac
   })
 }
 
-// Server Setup and Initialization
+/**
+ * This is primary execution and setup process for the server setup.
+ * Configurations are loaded,
+ * Globals from Configs Loaded,
+ * Supplementary Components Built
+ * Servers are Initialized
+ *
+ * All Dependencies are managed via explicit
+ */
 const runServer = () => {
   const config: ServerConfig = configs.loadConfig()
   const {
