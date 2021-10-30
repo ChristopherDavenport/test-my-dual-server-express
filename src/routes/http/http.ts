@@ -1,9 +1,9 @@
 import express from "express"
 import createError from "http-errors"
 import { Span, Tracer } from "opentracing"
-import requestId from "../../util/requestId"
-import prometheus from "../../util/prometheus"
-import tracing from "../../util/tracing"
+import requestId from "../../middleware/requestId"
+import prometheus from "../../middleware/prometheus"
+import tracing from "../../middleware/tracing"
 
 
 /**

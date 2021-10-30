@@ -1,8 +1,8 @@
 import express from "express"
 import createError from "http-errors"
 import { Tracer } from "opentracing"
-import prometheus from "../../util/prometheus"
-import tracing from "../../util/tracing"
+import prometheus from "../../middleware/prometheus"
+import tracing from "../../middleware/tracing"
 
 /*
   Health Server Declaration
