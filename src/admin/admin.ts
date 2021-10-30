@@ -21,6 +21,10 @@ const buildApp = () => {
     res.send("pong")
   })
 
+  app.get("/health", (req, res) => {
+    res.send()
+  })
+
   app.get("/", (req, res) => {
     res.set('Content-Type', 'text/html')
     res.send(Buffer.from(`
