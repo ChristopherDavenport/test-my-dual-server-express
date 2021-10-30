@@ -11,6 +11,10 @@ const opts: promBundle.Opts = {
   includeMethod: true,
   includeStatusCode: true,
 }
+// Invocation here actually binds to the global registry
+// So the same metrics cannot be registered more than once.
+// If this is moved care needs to be taken with the 2 server
+// setup to not double bind with this method.
 const middleware = promBundle(opts)
 
 /**
