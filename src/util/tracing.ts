@@ -4,7 +4,7 @@ import opentracing from "opentracing";
 import url from "url";
 import jaegerClient, { Logger } from "jaeger-client";
 import promClient from 'prom-client'
-import { env } from 'process';
+import {TracingConfig} from '../config/configs'
 
 const buildMiddleware = (tracer: opentracing.Tracer) => {
   return (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -66,38 +66,7 @@ const logger: Logger = {
 }
 
 
-
-export interface TracingConfig {
-  serviceName: string,
-  serviceVersion: string,
-  sampler: {
-    type: string,
-    param: number,
-    hostPort: string
-  },
-  reporter: {
-    agentHost: string,
-    agentPort: number
-  }
-}
-
-const loadConfig: () => TracingConfig = () => {
-  return {
-    serviceName: (env.APP_NAME || 'test_my_dual_service').replace(/-/g, '_'), // Can't use `-`
-    serviceVersion: env.APP_VERSION || '0.0.0',
-    sampler: {
-      type: process.env.JAEGER_SAMPLER_TYPE || 'remote',
-      param: parseInt(process.env.JAEGER_SAMPLER_PARAM, 10) || 1,
-      hostPort: process.env.JAEGER_SAMPLER_MANAGER_HOST_PORT || 'http://localhost:5778/sampling'
-    },
-    reporter: {
-      agentHost: process.env.JAEGER_AGENT_HOST || '',
-      agentPort: parseInt(process.env.JAEGER_AGENT_PORT, 10) || 6832
-    }
-  }
-}
-
-const createTracing = (config: TracingConfig) => {
+const createTracer = (config: TracingConfig) => {
   // See schema https://github.com/jaegertracing/jaeger-client-node/blob/master/src/configuration.js#L37
 
   const metrics = new jaegerClient.PrometheusMetricsFactory(promClient, config.serviceName);
@@ -113,22 +82,10 @@ const createTracing = (config: TracingConfig) => {
   const codec = new jaegerClient.ZipkinB3TextMapCodec({ urlEncoding: true })
   finalTracer.registerInjector('http_headers', codec)
   finalTracer.registerExtractor('http_headers', codec)
-
-  const middleware = buildMiddleware(finalTracer)
-  return {
-    middleware,
-    closeTracer: finalTracer.close
-  }
-
-}
-
-const defaultTracing = () => {
-  return createTracing(loadConfig())
+  return finalTracer
 }
 
 export default {
-  loadConfig,
-  createTracing,
-  defaultTracing,
-  default: defaultTracing()
+  createTracer,
+  middleware: buildMiddleware
 }

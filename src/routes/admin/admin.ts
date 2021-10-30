@@ -1,19 +1,15 @@
 import express from "express";
 import createError from "http-errors";
-import prometheus from "./prometheus";
-import tracing from "./tracing";
+import { Tracer } from "opentracing";
+import prometheus from "../../util/prometheus";
+import tracing from "../../util/tracing";
 
 /*
   Health Server Declaration
 */
 
-export const port: number = parseInt("PORT1", 10) || 8081
-
-const buildApp = () => {
-  const app = express()
-  app.set('port', port)
-
-  app.use(tracing.default.middleware)
+const buildApp = (app: express.Application, tracer: Tracer) => {
+  app.use(tracing.middleware(tracer))
   // Only Run This Middleware on Admin App to serve metrics calls
   app.get('/metrics', async (req, res, next) => {
     prometheus.middleware(req, res, next)
@@ -56,7 +52,5 @@ const buildApp = () => {
 }
 
 export default {
-  buildApp,
-  port,
-  description: 'Admin'
+  buildApp
 }

@@ -1,19 +1,17 @@
 import express, { application } from "express";
 import createError from "http-errors";
-import { Span } from "opentracing";
-import prometheus from "./admin/prometheus";
-import tracing from "./admin/tracing";
+import { Span, Tracer } from "opentracing";
+import prometheus from "../../util/prometheus";
+import tracing from "../../util/tracing";
 
 /*
   HTTP Server Declaration
 */
-const port = parseInt("PORT0", 10) || 8080;
 
-const buildApp = () => {
-  const app = express();
-  app.set('port', port)
+const buildApp = (app: express.Application, tracer: Tracer) => {
+  // const app = express();
   app.use(prometheus.middleware)
-  app.use(tracing.default.middleware)
+  app.use(tracing.middleware(tracer))
 
   // Define the Http Response Functions
   app.get("/ping", (req, res) => {
@@ -47,16 +45,15 @@ const buildApp = () => {
     res.locals.message = err.message;
     res.locals.error = req.app.get('env') === 'development' ? err : {};
 
+
     // render the error page
     res.status(err.status || 500);
-    res.json({level: 'error', err});
+    res.json({level: 'error', error: res.locals.error}); // Probably Need a Different PROD default
   });
 
   return app
 }
 
 export default {
-  buildApp,
-  port,
-  description: 'Http'
+  buildApp
 }
