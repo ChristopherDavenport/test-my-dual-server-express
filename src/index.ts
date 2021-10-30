@@ -1,6 +1,7 @@
 import { prototype } from 'events';
 import http from 'http';
 import adminApp from './admin/admin'
+import tracing from './admin/tracing';
 import httpApp from './http'
 
 // Helper Functions
@@ -9,6 +10,8 @@ const onListen = (server: http.Server, port: number, desc: string) => {
     console.log(desc + " Server started at: " + port)
   })
 }
+
+// Baselines
 
 // Server Setup and Initialization
 const httpServer = http.createServer(httpApp.buildApp())

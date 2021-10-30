@@ -9,5 +9,5 @@ const opts: promBundle.Opts = {includeMethod: true}
 const middleware = promBundle(opts)
 
 export default {
-  middleware
+  middleware,
 }

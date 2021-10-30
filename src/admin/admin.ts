@@ -1,6 +1,7 @@
 import express from "express";
 import createError from "http-errors";
 import prometheus from "./prometheus";
+import tracing from "./tracing";
 
 /*
   Health Server Declaration
@@ -10,12 +11,13 @@ export const port: number = parseInt("PORT1", 10) || 8081
 
 const buildApp = () => {
   const app = express()
+  app.set('port', port)
+
+  app.use(tracing.default.middleware)
   // Only Run This Middleware on Admin App to serve metrics calls
   app.get('/metrics', async (req, res, next) => {
     prometheus.middleware(req, res, next)
   })
-
-  app.set('port', port)
 
   app.get("/ping", (req, res) => {
     res.send("pong")
@@ -29,7 +31,9 @@ const buildApp = () => {
     res.set('Content-Type', 'text/html')
     res.send(Buffer.from(`
     <html><h2><ul>
+    <li><a href=\"/ping\">Ping</a></li>
       <li><a href=\"/metrics\">Metrics</a></li>
+      <li><a href=\"/health\">Health</a></li>
     </ul></h2></html>
   `))
   })
@@ -46,7 +50,7 @@ const buildApp = () => {
 
     // render the error page
     res.status(err.status || 500);
-    res.render('error');
+    res.json({level: 'error', err});
   });
   return app
 }

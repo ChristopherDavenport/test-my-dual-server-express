@@ -1,6 +1,8 @@
 import express, { application } from "express";
 import createError from "http-errors";
+import { Span } from "opentracing";
 import prometheus from "./admin/prometheus";
+import tracing from "./admin/tracing";
 
 /*
   HTTP Server Declaration
@@ -11,6 +13,7 @@ const buildApp = () => {
   const app = express();
   app.set('port', port)
   app.use(prometheus.middleware)
+  app.use(tracing.default.middleware)
 
   // Define the Http Response Functions
   app.get("/ping", (req, res) => {
@@ -23,6 +26,13 @@ const buildApp = () => {
 
   app.get("/hello/:bar", (req, res) => {
     const value = req.params.bar
+    const span: Span = res.locals.span
+    const span2 = span.tracer().startSpan(
+      "Arbitrary Span", {
+        childOf : span.context()
+      }
+    )
+    span2.finish()
     res.json({foo: "Hello " + value + "!"})
   })
 
@@ -39,7 +49,7 @@ const buildApp = () => {
 
     // render the error page
     res.status(err.status || 500);
-    res.render('error');
+    res.json({level: 'error', err});
   });
 
   return app
