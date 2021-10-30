@@ -25,6 +25,17 @@ const shutdownServers = (httpServer: http.Server, adminServer: http.Server, trac
       tracer.close()
     })
   })
+  process.on('SIGINT', () => {
+    console.log('Termination Sent')
+    adminServer.close(() => {
+      console.log('Admin server closed')
+    })
+    httpServer.close(() => {
+      tracer.close()
+      console.log("Tracer closed")
+      console.log('HTTP server closed')
+    })
+  })
 }
 
 // Server Setup and Initialization
