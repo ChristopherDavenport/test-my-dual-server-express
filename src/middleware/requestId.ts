@@ -14,7 +14,10 @@ const middleware = (req: express.Request, res: express.Response, next: express.N
     next()
   } catch(eUntyped) {
     const e: Error = eUntyped
-    iLogger.info(e)
+    iLogger.error({
+      message: "Issue Found in Request Id where none are expected",
+      ...e
+    })
     next(e)
   }
 }
