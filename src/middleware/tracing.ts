@@ -1,10 +1,11 @@
 import express from 'express'
 import { OutgoingHttpHeaders } from 'http'
-import opentracing from "opentracing"
+import opentracing, { Span } from "opentracing"
 import url from "url"
 import jaegerClient, { Logger } from "jaeger-client"
 import promClient from 'prom-client'
 import {TracingConfig} from '../config/configs'
+import resource from "resource-monad"
 
 const buildMiddleware = (tracer: opentracing.Tracer) => {
   return (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -52,6 +53,13 @@ const buildMiddleware = (tracer: opentracing.Tracer) => {
   }
 }
 
+function spanned<A>(span: Span, name: string, f: (span:Span) => Promise<A>): Promise<A> {
+  return resource.make(
+    async () => { return span.tracer().startSpan(name, {childOf: span})},
+    async (span: Span) => span.finish()
+  ).use(f)()
+}
+
 const info = (msg: string) => {
   console.info(msg)
 }
@@ -85,5 +93,6 @@ const createTracer = (config: TracingConfig) => {
 
 export default {
   createTracer,
-  middleware: buildMiddleware
+  middleware: buildMiddleware,
+  spanned
 }

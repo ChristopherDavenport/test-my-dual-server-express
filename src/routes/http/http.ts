@@ -50,10 +50,14 @@ const buildApp = (app: express.Application, tracer: Tracer) => {
     span.setTag("request.id", id)
     const logger = loggerGen.logger(id)
     logger.info("Created Logger Succesfully")
-    const client = c.propagatedClient(id)(span)
-    const resp = await client.get("http://localhost:8080/hello/" + value)
+    const data = await tracing.spanned(span, "Http Call", async (span: Span) => {
+      const client = c.propagatedClient(id)(span)
+      const resp = await client.get("http://localhost:8080/hello/" + value)
+      return resp.data
+    })
+
     // We actually round trip with our current span! This shows up correctly!
-    res.json(resp.data)
+    res.json(data)
   })
 
   // catch 404 and forward to error handler
