@@ -1,6 +1,6 @@
 import axios, {Axios} from "axios";
 import {Span, FORMAT_HTTP_HEADERS} from "opentracing";
-import {RequestId} from "./requestId";
+import {RequestId} from "../middleware/requestId";
 
 const propagatedClient : (id: RequestId) => (span: Span) => Axios = (id) => (span) => {
   const tracer = span.tracer()

@@ -4,8 +4,9 @@ import { Span, Tracer } from "opentracing"
 import requestId, { RequestId } from "../../middleware/requestId"
 import prometheus from "../../middleware/prometheus"
 import tracing from "../../middleware/tracing"
-import c from "../../middleware/client"
-
+import c from "../../util/clientGen"
+import loggerGen from "../../util/loggerGen"
+import logging from "../../middleware/logging"
 
 /**
  * HTTP Server Declaration
@@ -15,6 +16,7 @@ const buildApp = (app: express.Application, tracer: Tracer) => {
   app.use(prometheus.middleware) // Meters Traffic in this app
   app.use(tracing.middleware(tracer)) // Guarantees Presence of res.local.span
   app.use(requestId.middleware)
+  app.use(logging.logger) // Must be before Routers
 
   // Define the Http Response Functions
   app.get("/ping", (req, res) => {
@@ -46,6 +48,8 @@ const buildApp = (app: express.Application, tracer: Tracer) => {
     const span: Span = res.locals.span
     const id: RequestId = res.locals.requestId
     span.setTag("request.id", id)
+    const logger = loggerGen.logger(id)
+    logger.info("Created Logger Succesfully")
     const client = c.propagatedClient(id)(span)
     const resp = await client.get("http://localhost:8080/hello/" + value)
     // We actually round trip with our current span! This shows up correctly!
@@ -57,8 +61,10 @@ const buildApp = (app: express.Application, tracer: Tracer) => {
     next(createError(404))
   })
 
-  // error handler -- Types dont work currently
-  app.use((err: any, req: express.Request, res: express.Response, next: any) =>  {
+  // Must Be After Routers
+  app.use(logging.errorLogger)
+
+  app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) =>  {
     // set locals, only providing error in development
     res.locals.message = err.message
     res.locals.error = req.app.get('env') === 'development' ? err : {}

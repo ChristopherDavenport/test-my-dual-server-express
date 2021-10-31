@@ -1,5 +1,6 @@
 import express from "express"
 import {v4 as uuidv4} from "uuid" // Assumption of default export can end in unitialization.
+import { iLogger } from "../util/loggerGen"
 // Uncertain how to tell ahead of time, but this explains things I've found a couple times now.
 
 /**
@@ -13,7 +14,7 @@ const middleware = (req: express.Request, res: express.Response, next: express.N
     next()
   } catch(eUntyped) {
     const e: Error = eUntyped
-    console.log(e)
+    iLogger.info(e)
     next(e)
   }
 }

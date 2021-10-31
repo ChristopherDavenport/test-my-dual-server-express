@@ -3,6 +3,7 @@ import createError from "http-errors"
 import { Tracer } from "opentracing"
 import prometheus from "../../middleware/prometheus"
 import tracing from "../../middleware/tracing"
+import logging from "../../middleware/logging"
 
 /*
   Health Server Declaration
@@ -10,6 +11,7 @@ import tracing from "../../middleware/tracing"
 
 const buildApp = (app: express.Application, tracer: Tracer) => {
   app.use(tracing.middleware(tracer))
+  app.use(logging.logger) // Must Be Before Routes
   // Only Run This Middleware on Admin App to serve metrics calls
   // Ensures other endpoints on admin don't trigger metrics
   // which would get confusing for the http metrics.
@@ -40,6 +42,8 @@ const buildApp = (app: express.Application, tracer: Tracer) => {
   app.use((req, res, next) =>  {
     next(createError(404))
   })
+
+  app.use(logging.errorLogger)
 
   app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) =>  {
     // set locals, only providing error in development

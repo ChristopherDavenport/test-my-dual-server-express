@@ -4,29 +4,30 @@ import httpApp from './routes/http/http'
 import configs, { ServerConfig } from "./config/configs"
 import { JaegerTracer } from "jaeger-client"
 import globals from "./config/globals"
+import { iLogger } from './util/loggerGen'
 
 // Helper Functions
 
 const shutdownServers = (httpServer: http.Server, adminServer: http.Server, tracer: JaegerTracer) => {
   process.on('SIGTERM', () => {
-    console.log('SIGTERM Sent')
+    iLogger.info('SIGTERM Sent')
     adminServer.close(() => {
-      console.log('Admin server closed')
+      iLogger.info('Admin server closed')
     })
     httpServer.close(() => {
-      console.log('HTTP server closed')
+      iLogger.info('HTTP server closed')
       tracer.close()
     })
   })
   process.on('SIGINT', () => {
-    console.log('SIGINT Sent')
+    iLogger.info('SIGINT Sent')
     adminServer.close(() => {
-      console.log('Admin server closed')
+      iLogger.info('Admin server closed')
     })
     httpServer.close(() => {
       tracer.close()
-      console.log("Tracer closed")
-      console.log('HTTP server closed')
+      iLogger.info("Tracer closed")
+      iLogger.info('HTTP server closed')
     })
   })
 }

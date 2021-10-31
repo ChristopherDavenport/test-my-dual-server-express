@@ -3,10 +3,11 @@ import express from "express"
 import http from 'http'
 import { JaegerTracer } from "jaeger-client"
 import tracing from "../middleware/tracing"
+import { iLogger } from "../util/loggerGen"
 
 const onListen = (server: http.Server, port: number, desc: string) => {
   server.on("listening", () => {
-    console.log(desc + " Server started at: " + port)
+    iLogger.info(desc + " Server started at: " + port)
   })
 }
 
