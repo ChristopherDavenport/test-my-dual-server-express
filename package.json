@@ -31,7 +31,7 @@
     "jaeger-client": "^3.18.1",
     "opentracing": "^0.14.5",
     "prom-client": "^14.0.0",
-    "resource-monad": "^1.0.4",
+    "resource-monad": "^1.0.5",
     "uuid": "^8.3.2",
     "winston": "^3.3.3"
   }
